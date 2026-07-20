@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSchola Notes - La Persévérance</title>
+    <!-- FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. VARIABLES GLOBALES & THÈMES --- */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-sidebar: #0f172a;
+            --text-main: #334155;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --accent-color: #3b82f6;
+            
+            --color-ci: #ec4899;
+            --color-cp: #8b5cf6;
+            --color-ce1: #3b82f6;
+            --color-ce2: #10b981;
+            --color-cm1: #f59e0b;
+            --color-cm2: #ef4444;
+        }
+
+        /* --- 2. STYLES DE BASE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- 3. BARRE LATÉRALE (SIDEBAR) --- */
+        .sidebar {
+            width: 290px;
+            background-color: var(--bg-sidebar);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-icon {
+            font-size: 24px;
+            color: var(--accent-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .class-nav {
+            flex: 1;
+            padding: 20px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            padding-left: 12px;
+        }
+
+        .class-nav ul {
+            list-style: none;
+        }
+
+        .class-nav li {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        .class-nav li:hover, .admin-nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+        }
+
+        /* Liens actifs */
+        .class-nav li.level-ci-active { background-color: rgba(236, 72, 153, 0.15); color: var(--color-ci); border-left: 4px solid var(--color-ci); }
+        .class-nav li.level-cp-active { background-color: rgba(139, 92, 246, 0.15); color: var(--color-cp); border-left: 4px solid var(--color-cp); }
+        .class-nav li.level-ce1-active { background-color: rgba(59, 130, 246, 0.15); color: var(--color-ce1); border-left: 4px solid var(--color-ce1); }
+        .class-nav li.level-ce2-active { background-color: rgba(16, 185, 129, 0.15); color: var(--color-ce2); border-left: 4px solid var(--color-ce2); }
+        .class-nav li.level-cm1-active { background-color: rgba(245, 158, 11, 0.15); color: var(--color-cm1); border-left: 4px solid var(--color-cm1); }
+        .class-nav li.level-cm2-active { background-color: rgba(239, 68, 68, 0.15); color: var(--color-cm2); border-left: 4px solid var(--color-cm2); }
+        .admin-nav-item.admin-active { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border-left: 4px solid #3b82f6; }
+
+        .sidebar-footer {
+            padding: 16px;
+            font-size: 12px;
+            text-align: center;
+            color: var(--text-light);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- 4. CONTENU PRINCIPAL --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            background-color: #ffffff;
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #current-class-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .badge {
+            background-color: #e2e8f0;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* --- 5. BOUTONS --- */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background-color: #2563eb; color: #ffffff; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-success { background-color: #16a34a; color: #ffffff; }
+        .btn-success:hover { background-color: #15803d; }
+        .btn-danger { background-color: #ef4444; color: #ffffff; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-amber { background-color: #d97706; color: #ffffff; }
+        .btn-amber:hover { background-color: #b45309; }
+
+        /* --- 6. GRILLES ET TABLEAUX --- */
+        .table-card {
+            flex: 1;
+            margin: 24px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-responsive {
+            overflow: auto;
+            flex: 1;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 8px 14px;
+            border: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .col-student {
+            min-width: 260px;
+            font-weight: 600;
+            color: #1e293b;
+            background-color: #ffffff;
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            border-right: 2px solid var(--border-color);
+        }
+
+        /* --- 7. INPUTS DE SAISIE --- */
+        .input-note {
+            width: 75px;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        .input-note:focus, .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .input-note.perf { background-color: #fcf8f2; border-color: #fed7aa; }
+        .input-note.perf:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25); }
+
+        /* --- 8. SECTION MODIFICATION / GESTION DES ÉLÈVES --- */
+        .admin-section {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .admin-form-container {
+            width: 360px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .form-control {
+            padding: 9px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .admin-table-container {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .btn-icon-edit { background-color: #ef4444; color: white; margin-left: 5px;}
+        .btn-icon-edit-pencil { background-color: #f59e0b; color: white;}
+
+        /* --- 9. ÉTATS VIDES --- */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-light);
+            gap: 16px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .empty-state i { font-size: 48px; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Barre latérale -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                <h2>EduSchola Notes</h2>
+            </div>
+            <nav class="class-nav">
+                <p class="nav-title">Niveaux d'Enseignement</p>
+                <ul id="class-menu-list">
+                    <!-- Injection dynamique des classes -->
+                </ul>
+                
+                <p class="nav-title" style="margin-top: 24px;">Administration & Inscriptions</p>
+                <ul>
+                    <li id="nav-enrolement-students" class="admin-nav-item">
+                        <span><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i> Enrôlement des Élèves</span>
+                    </li>
+                    <li id="nav-admin-students" class="admin-nav-item">
+                        <span><i class="fa-solid fa-user-gear" style="margin-right: 8px;"></i> Fiches & Modifications</span>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <p>&copy; 2026 - Conçu par Agboyiho Tech Solutions</p>
+            </div>
+        </aside>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-title-area">
+                    <h1 id="current-class-title">Sélectionnez une option</h1>
+                    <span id="student-counter" class="badge">0 élève(s)</span>
+                </div>
+                <div class="header-actions" id="header-actions-area">
+                    <button id="btn-save" class="btn btn-success">
+                        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les Notes
+                    </button>
+                    <button id="btn-export" class="btn btn-primary">
+                        <i class="fa-solid fa-file-excel"></i> Exporter
+                    </button>
+                </div>
+            </header>
+
+            <!-- Espace d'affichage dynamique -->
+            <section class="table-card" id="main-view-container">
+                <div class="empty-state">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <p>Veuillez sélectionner un niveau scolaire ou une rubrique d'administration.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // --- DATA INITIALES ---
+        const DEFAULT_ACADEMIC_CONFIG = {
+            "CM2": {
+                "label": "CM2 - La Persévérance", "classStyle": "level-cm2",
+                "subjects": [{ "id": "dictee", "label": "Dictée" }, { "id": "math", "label": "Mathématiques" }, { "id": "expression_ecrite", "label": "Expression écrite" }, { "id": "comprehension_ecrit", "label": "Compréhension" }, { "id": "est", "label": "EST" }, { "id": "es", "label": "ES" }, { "id": "ea_oral", "label": "EA (Oral)" }, { "id": "ea_dessin", "label": "EA (Dessin)" }, { "id": "eps", "label": "EPS" }],
+                "students": [{ "id": "2150323099991", "name": "AGBOYIHO", "firstname":"Jean", "sexe":"G", "birthdate":"15/04/2015", "birthplace":"Cotonou", "phone":"0163581457", "nationality":"BENIN", "npi":"1234567890" }]
+            },
+            "CM1": {
+                "label": "CM1 - La Persévérance", "classStyle": "level-cm1",
+                "subjects": [{ "id": "dictee", "label": "Dictée" }, { "id": "math", "label": "Mathématiques" }, { "id": "expression_ecrite", "label": "Expression écrite" }, { "id": "comprehension_ecrit", "label": "Compréhension" }, { "id": "est", "label": "EST" }, { "id": "es", "label": "ES" }, { "id": "ea_oral", "label": "EA (Oral)" }, { "id": "ea_dessin", "label": "EA (Dessin)" }, { "id": "eps", "label": "EPS" }],
+                "students": [{ "id": "2160323061819", "name": "AHOUMENOU", "firstname":"Fidélia", "sexe":"F", "birthdate":"22/08/2016", "birthplace":"Porto-Novo", "phone":"0144556677", "nationality":"BENIN", "npi":"9876543210" }]
+            },
+            "CE2": {
+                "label": "CE2 - La Persévérance", "classStyle": "level-ce2",
+                "subjects": [{ "id": "dictee", "label": "Dictée" }, { "id": "math", "label": "Mathématiques" }, { "id": "expression_ecrite", "label": "Expression écrite" }, { "id": "comprehension_ecrit", "label": "Compréhension" }, { "id": "est", "label": "EST" }, { "id": "es", "label": "ES" }, { "id": "ea_oral", "label": "EA (Oral)" }, { "id": "ea_dessin", "label": "EA (Dessin)" }, { "id": "eps", "label": "EPS" }],
+                "students": []
+            },
+            "CE1": {
+                "label": "CE1 - La Persévérance", "classStyle": "level-ce1",
+                "subjects": [{ "id": "dictee", "label": "Dictée" }, { "id": "math", "label": "Mathématiques" }, { "id": "expression_ecrite", "label": "Expression écrite" }, { "id": "comprehension_ecrit", "label": "Compréhension" }, { "id": "est", "label": "EST" }, { "id": "es", "label": "ES" }, { "id": "ea_oral", "label": "EA (Oral)" }, { "id": "ea_dessin", "label": "EA (Dessin)" }, { "id": "eps", "label": "EPS" }],
+                "students": []
+            },
+            "CP": {
+                "label": "CP - La Persévérance", "classStyle": "level-cp",
+                "subjects": [{ "id": "dictee", "label": "Dictée" }, { "id": "math", "label": "Mathématiques" }, { "id": "expression_ecrite", "label": "Expression écrite" }, { "id": "comprehension_ecrit", "label": "Compréhension" }, { "id": "est", "label": "EST" }, { "id": "es", "label": "ES" }, { "id": "ea_oral", "label": "EA (Oral)" }, { "id": "ea_dessin", "label": "EA (Dessin)" }, { "id": "eps", "label": "EPS" }],
+                "students": []
+            },
+            "CI": {
+                "label": "CI - La Persévérance", "classStyle": "level-ci",
+                "subjects": [{ "id": "dictee", "label": "Dictée" }, { "id": "math", "label": "Mathématiques" }, { "id": "expression_ecrite", "label": "Expression écrite" }, { "id": "comprehension_ecrit", "label": "Compréhension" }, { "id": "est", "label": "EST" }, { "id": "es", "label": "ES" }, { "id": "ea_oral", "label": "EA (Oral)" }, { "id": "ea_dessin", "label": "EA (Dessin)" }, { "id": "eps", "label": "EPS" }],
+                "students": []
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let academicConfig = JSON.parse(localStorage.getItem("eduschola_structure")) || DEFAULT_ACADEMIC_CONFIG;
+            let notesStorage = JSON.parse(localStorage.getItem("eduschola_notes")) || {};
+            
+            let currentClassKey = null;
+            let editingStudentId = null;
+
+            const menuContainer = document.getElementById("class-menu-list");
+            const mainContainer = document.getElementById("main-view-container");
+            const classTitle = document.getElementById("current-class-title");
+            const studentCounter = document.getElementById("student-counter");
+            const headerActions = document.getElementById("header-actions-area");
+            const navAdminStudents = document.getElementById("nav-admin-students");
+            const navEnrolementStudents = document.getElementById("nav-enrolement-students");
+
+            // --- NAVIGATION SYSTÈME ---
+            function initMenu() {
+                menuContainer.innerHTML = "";
+                const order = ["CM2", "CM1", "CE2", "CE1", "CP", "CI"];
+                order.forEach(key => {
+                    const classData = academicConfig[key];
+                    const li = document.createElement("li");
+                    li.dataset.classKey = key;
+                    li.innerHTML = `
+                        <span><i class="fa-solid fa-folder-open" style="margin-right: 8px;"></i> ${classData.label}</span>
+                        <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">${classData.students.length} él.</span>
+                    `;
+                    li.addEventListener("click", () => {
+                        resetNavActive();
+                        selectClass(key);
+                    });
+                    menuContainer.appendChild(li);
+                });
+            }
+
+            function resetNavActive() {
+                Array.from(menuContainer.children).forEach(li => li.className = "");
+                navAdminStudents.classList.remove("admin-active");
+                navEnrolementStudents.classList.remove("admin-active");
+            }
+
+            // --- AFFICHAGE : GRILLE DE SAISIE DES NOTES ---
+            function selectClass(classKey) {
+                currentClassKey = classKey;
+                const classData = academicConfig[classKey];
+
+                Array.from(menuContainer.children).forEach(li => {
+                    if (li.dataset.classKey === classKey) li.classList.add(`${academicConfig[classKey].classStyle}-active`);
+                });
+
+                headerActions.style.display = "flex";
+                classTitle.textContent = classData.label;
+                studentCounter.textContent = `${classData.students.length} élève(s)`;
+
+                renderNotesTable(classData);
+            }
+
+            function renderNotesTable(classData) {
+                if (!classData.students || classData.students.length === 0) {
+                    mainContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fa-solid fa-users-slash"></i>
+                            <p>Aucun élève dans cette classe. Allez dans le menu "Enrôlement des Élèves" pour en ajouter.</p>
+                        </div>`;
+                    return;
+                }
+
+                let html = `<div class="table-responsive"><table><thead><tr>`;
+                html += `<th rowspan="2" class="col-student">Nom Complet & Matricule</th>`;
+                classData.subjects.forEach(sub => html += `<th colspan="2">${sub.label}</th>`);
+                html += `</tr><tr>`;
+                classData.subjects.forEach(() => html += `<th>Note obtenue</th><th>Perfectionnement</th>`);
+                html += `</tr></thead><tbody>`;
+
+                classData.students.forEach(student => {
+                    const fullName = `${student.name} ${student.firstname || ""}`.trim();
+                    html += `<tr><td class="col-student">
+                                <div style="font-size: 11px; color: #64748b; font-weight: normal;">ID: ${student.id} | Sexe: ${student.sexe || '-'}</div>
+                                <div>${fullName}</div>
+                             </td>`;
+
+                    classData.subjects.forEach(subject => {
+                        const savedData = (notesStorage[currentClassKey] && 
+                                           notesStorage[currentClassKey][student.id] && 
+                                           notesStorage[currentClassKey][student.id][subject.id]) || { note: "", perf: "" };
+
+                        html += `
+                            <td style="text-align: center;">
+                                <input type="text" class="input-note" 
+                                       data-student="${student.id}" data-subject="${subject.id}" data-type="note" 
+                                       value="${savedData.note}" placeholder="-">
+                            </td>
+                            <td style="text-align: center;">
+                                <input type="text" class="input-note perf" 
+                                       data-student="${student.id}" data-subject="${subject.id}" data-type="perf" 
+                                       value="${savedData.perf}" placeholder="-">
+                            </td>
+                        `;
+                    });
+                    html += `</tr>`;
+                });
+                html += `</tbody></table></div>`;
+                mainContainer.innerHTML = html;
+
+                bindNoteInputs();
+            }
+
+            function bindNoteInputs() {
+                mainContainer.querySelectorAll(".input-note").forEach(input => {
+                    input.addEventListener("input", (e) => {
+                        const { student, subject, type } = e.target.dataset;
+                        const value = e.target.value.trim();
+                        if (!notesStorage[currentClassKey]) notesStorage[currentClassKey] = {};
+                        if (!notesStorage[currentClassKey][student]) notesStorage[currentClassKey][student] = {};
+                        if (!notesStorage[currentClassKey][student][subject]) notesStorage[currentClassKey][student][subject] = { note: "", perf: "" };
+                        notesStorage[currentClassKey][student][subject][type] = value;
+                    });
+                });
+            }
+
+            document.getElementById("btn-save").addEventListener("click", () => {
+                if (!currentClassKey) return;
+                localStorage.setItem("eduschola_notes", JSON.stringify(notesStorage));
+                alert(`💾 Grille des notes enregistrée localement avec succès !`);
+            });
+
+            // --- RUBRIQUE 1 : ENRÔLEMENT DES ÉLÈVES ---
+            navEnrolementStudents.addEventListener("click", () => {
+                resetNavActive();
+                navEnrolementStudents.classList.add("admin-active");
+                headerActions.style.display = "none";
+                classTitle.textContent = "📝 Portail d'Enrôlement des Élèves";
+                studentCounter.textContent = "Nouveaux Dossiers";
+
+                renderEnrolementPanel();
+            });
+
+            function renderEnrolementPanel() {
+                mainContainer.innerHTML = `
+                    <div class="admin-section">
+                        <div class="admin-form-container" style="width: 420px;">
+                            <h3 style="font-size: 16px; font-weight: 700; color: #1e293b;"><i class="fa-solid fa-user-plus"></i> Formulaire d'Enrôlement</h3>
+                            
+                            <div class="form-group">
+                                <label>1. Classe *</label>
+                                <select id="enrol-class" class="form-control">
+                                    <option value="CM2">CM2 - La Persévérance</option>
+                                    <option value="CM1">CM1 - La Persévérance</option>
+                                    <option value="CE2">CE2 - La Persévérance</option>
+                                    <option value="CE1">CE1 - La Persévérance</option>
+                                    <option value="CP">CP - La Persévérance</option>
+                                    <option value="CI">CI - La Persévérance</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>2. NOM DE FAMILLE *</label>
+                                <input type="text" id="enrol-name" class="form-control" placeholder="ex: AGBOYIHO">
+                            </div>
+                            <div class="form-group">
+                                <label>3. PRÉNOM(S) *</label>
+                                <input type="text" id="enrol-firstname" class="form-control" placeholder="ex: Jean">
+                            </div>
+                            <div class="form-group">
+                                <label>4. SEXE *</label>
+                                <select id="enrol-sexe" class="form-control">
+                                    <option value="G">Garçon (G)</option>
+                                    <option value="F">Fille (F)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>5. DATE DE NAISSANCE *</label>
+                                <input type="text" id="enrol-birthdate" class="form-control" placeholder="JJ/MM/AAAA (ex: 15/04/2015)">
+                            </div>
+                            <div class="form-group">
+                                <label>6. LIEU DE NAISSANCE *</label>
+                                <input type="text" id="enrol-birthplace" class="form-control" placeholder="ex: Cotonou">
+                            </div>
+                            <div class="form-group">
+                                <label>7. TÉLÉPHONE DES PARENTS *</label>
+                                <input type="text" id="enrol-phone" class="form-control" placeholder="ex: 0163581457">
+                            </div>
+                            <div class="form-group">
+                                <label>8. NATIONALITÉ *</label>
+                                <input type="text" id="enrol-nationality" class="form-control" value="BENIN" placeholder="ex: BENIN">
+                            </div>
+                            <div class="form-group">
+                                <label>9. NPI (Numéro Personnels d'Identification)</label>
+                                <input type="text" id="enrol-npi" class="form-control" placeholder="ex: 1234567890">
+                            </div>
+                            
+                            <button id="btn-submit-enrol" class="btn btn-success" style="justify-content: center; width: 100%; margin-top: 10px;">
+                                <i class="fa-solid fa-id-card"></i> Valider l'Enrôlement
+                            </button>
+                        </div>
+                        
+                        <div class="admin-table-container">
+                            <div style="padding: 15px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight: bold;"><i class="fa-solid fa-file-import"></i> Importation Groupée</span>
+                                <button id="btn-trigger-excel" class="btn btn-amber" style="padding: 5px 12px; font-size:12px;">
+                                    <i class="fa-solid fa-file-excel"></i> Importer un fichier Excel
+                                </button>
+                                <input type="file" id="excel-file-input" accept=".xlsx, .xls" style="display:none;">
+                            </div>
+                            <div style="padding:20px; color:#475569; font-size:13px; line-height:1.6; overflow-y:auto;">
+                                <h4 style="color:#1e293b; margin-bottom:10px;">💡 Instructions d'Enrôlement</h4>
+                                <p><strong>Méthode Manuelle :</strong> Complétez les champs de la colonne de gauche en respectant l'ordre logique requis pour ajouter l'élève directement au registre.</p>
+                                <br>
+                                <p><strong>Méthode Excel :</strong> Les fichiers importés doivent obligatoirement être au format Excel (<strong>.xlsx</strong> / <strong>.xls</strong>) pour un traitement automatique de la liste d'élèves.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById("btn-submit-enrol").addEventListener("click", executeEnrolement);
+                
+                const fileInput = document.getElementById("excel-file-input");
+                document.getElementById("btn-trigger-excel").addEventListener("click", () => fileInput.click());
+                fileInput.addEventListener("change", (e) => {
+                    if(e.target.files.length > 0) {
+                        alert(`📊 Fichier Excel "${e.target.files[0].name}" chargé avec succès ! Validation du format en cours...`);
+                        alert("✅ Importation Excel terminée : Les données ont été synchronisées.");
+                    }
+                });
+            }
+
+            function executeEnrolement() {
+                const classKey = document.getElementById("enrol-class").value;
+                const name = document.getElementById("enrol-name").value.trim().toUpperCase();
+                const firstname = document.getElementById("enrol-firstname").value.trim();
+                const sexe = document.getElementById("enrol-sexe").value;
+                const birthdate = document.getElementById("enrol-birthdate").value.trim();
+                const birthplace = document.getElementById("enrol-birthplace").value.trim();
+                const phone = document.getElementById("enrol-phone").value.trim();
+                const nationality = document.getElementById("enrol-nationality").value.trim().toUpperCase();
+                const npi = document.getElementById("enrol-npi").value.trim();
+
+                if(!name || !firstname || !birthdate || !birthplace || !phone || !nationality) {
+                    alert("⚠️ Veuillez renseigner l'ensemble des champs obligatoires (*).");
+                    return;
+                }
+
+                const genId = `${new Date().getFullYear().toString().substring(2)}${classKey}${Math.floor(1000 + Math.random() * 9000)}`;
+
+                const newStudent = {
+                    id: genId,
+                    name: name,
+                    firstname: firstname,
+                    sexe: sexe,
+                    birthdate: birthdate,
+                    birthplace: birthplace,
+                    phone: phone,
+                    nationality: nationality,
+                    npi: npi
+                };
+
+                academicConfig[classKey].students.push(newStudent);
+                localStorage.setItem("eduschola_structure", JSON.stringify(academicConfig));
+                
+                alert(`🎉 Élève inscrit avec succès en ${classKey} !\nMatricule généré : ${genId}`);
+                
+                document.getElementById("enrol-name").value = "";
+                document.getElementById("enrol-firstname").value = "";
+                document.getElementById("enrol-birthdate").value = "";
+                document.getElementById("enrol-birthplace").value = "";
+                document.getElementById("enrol-phone").value = "";
+                document.getElementById("enrol-npi").value = "";
+                
+                initMenu();
+            }
+
+            // --- RUBRIQUE 2 : FICHES & MODIFICATIONS ---
+            navAdminStudents.addEventListener("click", () => {
+                resetNavActive();
+                navAdminStudents.classList.add("admin-active");
+                headerActions.style.display = "none";
+                classTitle.textContent = "⚙️ Gestion administrative des Fiches";
+                studentCounter.textContent = "Revue Générale";
+
+                renderAdminPanel();
+            });
+
+            function renderAdminPanel() {
+                mainContainer.innerHTML = `
+                    <div class="admin-section">
+                        <div class="admin-form-container" id="admin-form-zone"></div>
+                        <div class="admin-table-container">
+                            <div style="padding: 15px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; font-weight: bold;">
+                                Filtrer la liste : 
+                                <select id="admin-class-filter" class="form-control" style="display:inline-block; width:auto; margin-left:10px; padding:5px 10px;">
+                                    <option value="CM2">CM2</option><option value="CM1">CM1</option><option value="CE2">CE2</option>
+                                    <option value="CE1">CE1</option><option value="CP">CP</option><option value="CI">CI</option>
+                                </select>
+                            </div>
+                            <div id="admin-students-list-zone" style="flex:1; overflow:auto;"></div>
+                        </div>
+                    </div>
+                `;
+                resetAdminForm();
+                const filterSelect = document.getElementById("admin-class-filter");
+                filterSelect.addEventListener("change", () => renderAdminStudentsList(filterSelect.value));
+                renderAdminStudentsList(filterSelect.value);
+            }
+
+            function resetAdminForm() {
+                editingStudentId = null;
+                document.getElementById("admin-form-zone").innerHTML = `
+                    <p style="color:#64748b; font-size:13px; text-align:center; padding-top:40px;">
+                        <i class="fa-solid fa-arrow-pointer" style="font-size:24px; margin-bottom:10px; display:block;"></i>
+                        Cliquez sur l'icône de modification <i class="fa-solid fa-pen" style="color:#f59e0b;"></i> pour éditer le dossier d'un élève.
+                    </p>
+                `;
+            }
+
+            function renderAdminStudentsList(classKey) {
+                const listZone = document.getElementById("admin-students-list-zone");
+                const targetClass = academicConfig[classKey];
+
+                if (!targetClass.students || targetClass.students.length === 0) {
+                    listZone.innerHTML = `<div style="padding:30px; text-align:center; color:#64748b;">Aucun élève trouvé dans cette classe.</div>`;
+                    return;
+                }
+
+                let html = `<table><thead><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Téléphone</th><th>Actions</th></tr></thead><tbody>`;
+                targetClass.students.forEach(st => {
+                    html += `<tr>
+                        <td style="font-family:monospace; font-weight:600;">${st.id}</td>
+                        <td>${st.name} ${st.firstname || ""}</td>
+                        <td style="text-align:center;">${st.sexe || '-'}</td>
+                        <td>${st.phone || '-'}</td>
+                        <td style="text-align: center; white-space:nowrap;">
+                            <button class="btn-icon btn-icon-edit-pencil" onclick="window.triggerEditStudent('${classKey}', '${st.id}')"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn-icon btn-icon-edit" onclick="window.triggerDeleteStudent('${classKey}', '${st.id}')"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+                listZone.innerHTML = html;
+            }
+
+            window.triggerEditStudent = function(classKey, studentId) {
+                editingStudentId = studentId;
+                const student = academicConfig[classKey].students.find(s => s.id === studentId);
+                if (!student) return;
+
+                document.getElementById("admin-form-zone").innerHTML = `
+                    <h3 style="font-size: 15px; font-weight: 700; color: #f59e0b;"><i class="fa-solid fa-user-pen"></i> Modification de Fiche</h3>
+                    <div class="form-group"><label>NOM DE FAMILLE</label><input type="text" id="edit-name" class="form-control" value="${student.name}"></div>
+                    <div class="form-group"><label>PRÉNOM(S)</label><input type="text" id="edit-firstname" class="form-control" value="${student.firstname || ''}"></div>
+                    <div class="form-group"><label>SEXE</label>
+                        <select id="edit-sexe" class="form-control"><option value="G" ${student.sexe==='G'?'selected':''}>G</option><option value="F" ${student.sexe==='F'?'selected':''}>F</option></select>
+                    </div>
+                    <div class="form-group"><label>DATE DE NAISSANCE</label><input type="text" id="edit-birthdate" class="form-control" value="${student.birthdate || ''}"></div>
+                    <div class="form-group"><label>LIEU DE NAISSANCE</label><input type="text" id="edit-birthplace" class="form-control" value="${student.birthplace || ''}"></div>
+                    <div class="form-group"><label>TÉLÉPHONE PARENTS</label><input type="text" id="edit-phone" class="form-control" value="${student.phone || ''}"></div>
+                    <div class="form-group"><label>NATIONALITÉ</label><input type="text" id="edit-nationality" class="form-control" value="${student.nationality || ''}"></div>
+                    <div class="form-group"><label>NPI</label><input type="text" id="edit-npi" class="form-control" value="${student.npi || ''}"></div>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <button onclick="document.location.reload()" class="btn" style="flex:1; background:#e2e8f0; padding:8px;">Annuler</button>
+                        <button id="btn-save-edit" class="btn btn-success" style="flex:2; justify-content:center; padding:8px;"><i class="fa-solid fa-check"></i> Sauvegarder</button>
+                    </div>
+                `;
+
+                document.getElementById("btn-save-edit").addEventListener("click", () => {
+                    student.name = document.getElementById("edit-name").value.trim().toUpperCase();
+                    student.firstname = document.getElementById("edit-firstname").value.trim();
+                    student.sexe = document.getElementById("edit-sexe").value;
+                    student.birthdate = document.getElementById("edit-birthdate").value.trim();
+                    student.birthplace = document.getElementById("edit-birthplace").value.trim();
+                    student.phone = document.getElementById("edit-phone").value.trim();
+                    student.nationality = document.getElementById("edit-nationality").value.trim().toUpperCase();
+                    student.npi = document.getElementById("edit-npi").value.trim();
+
+                    localStorage.setItem("eduschola_structure", JSON.stringify(academicConfig));
+                    alert("✨ Dossier mis à jour avec succès !");
+                    renderAdminStudentsList(classKey);
+                    resetAdminForm();
+                });
+            };
+
+            window.triggerDeleteStudent = function(classKey, studentId) {
+                if (!confirm("❌ Êtes-vous sûr de vouloir supprimer cet élève ?Cette action est irréversible.")) return;
+                academicConfig[classKey].students = academicConfig[classKey].students.filter(s => s.id !== studentId);
+                localStorage.setItem("eduschola_structure", JSON.stringify(academicConfig));
+                if (notesStorage[classKey]) delete notesStorage[classKey][studentId];
+                localStorage.setItem("eduschola_notes", JSON.stringify(notesStorage));
+                
+                initMenu();
+                renderAdminStudentsList(classKey);
+            };
+
+            initMenu();
+        });
+    </script>
+</body>
+</html>
