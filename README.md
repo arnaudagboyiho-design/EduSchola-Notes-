@@ -51,7 +51,4 @@ Une interface dédiée à l'inscription rapide des élèves avec un respect stri
 
 Aucune installation complexe ou serveur web (Node.js, PHP, DB) n'est requise.
 
-1. **Télécharger le projet :**
-   Clonez le dépôt ou téléchargez le fichier `index.html`.
-   ```bash
-   git clone [https://github.com/votre-compte/eduschola-notes.git](https://github.com/votre-compte/eduschola-notes.git)
+
